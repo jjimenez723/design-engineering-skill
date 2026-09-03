@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Engineering"
+  short_description: "Polish layout, forms, hierarchy, and motion"
+  default_prompt: "Use $emil-design-eng to build or review this interface for hierarchy, usability, and interaction craft."
