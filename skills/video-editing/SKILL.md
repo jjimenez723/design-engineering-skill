@@ -1,6 +1,6 @@
 ---
 name: video-editing
-description: Edit footage into polished, source-grounded videos with purposeful cuts, motion graphics, captions, and verified exports. Use for requested editing or graphics deliverables; do not use for video-only analysis, standalone subtitle work, generative restyling, or clip-variant testing.
+description: Edit footage into polished, source-grounded short-form videos with aggressive silence cuts, beat-matched minimal motion graphics, intentional SFX, 3-5 word captions, and verified exports or native CapCut drafts. Use for requested editing or graphics deliverables (including building CapCut timelines on a Mac); do not use for video-only analysis, standalone subtitle work, generative restyling, or clip-variant testing.
 metadata:
   short-description: Produce polished, source-grounded video edits
 ---
@@ -8,15 +8,15 @@ metadata:
 # Video editing
 
 Use this skill when the user wants a finished video or an editing change: cuts,
-pacing, soundtrack-preserving trims, overlays, animated title cards, captions,
-or export packaging. Use the project's existing editing stack when one exists;
-Higgsedit is appropriate for native editable compositions, while a local
-ffmpeg-based workflow is appropriate when that is already the working path.
+pacing, de-silencing, overlays, animated cards, captions, SFX, background
+removal, a CapCut timeline, or export packaging. Use the project's existing
+editing stack when one exists; Higgsedit is appropriate for native editable
+compositions, a local ffmpeg workflow when that is already the working path, and
+a generated CapCut draft when the user asks for the edit "in my CapCut timeline".
 
 The standard is not merely a playable file. The result should be a coherent,
 source-faithful edit whose visuals support the spoken idea, whose captions are
-accurate and readable, and whose final export has been both visually inspected
-and technically decoded.
+accurate and in sync, and whose output has been visually inspected and decoded.
 
 ## Boundaries
 
@@ -26,110 +26,183 @@ and technically decoded.
   dedicated subtitles skill when it is available.
 - For targeted object replacement or ordered clip variants, use the dedicated
   ad-multiplier workflow when it is available.
-- Do not invent dialogue, transcript phrases, brand names, repository names, or
-  visual proof that is not supported by the supplied media or verified source.
-- Preserve the original media and create a distinct output for each meaningful
-  revision.
+- Never invent dialogue, transcript phrases, brand names, repository names, stats,
+  or visual proof. A recreated UI (e.g. a ChatGPT answer) must reproduce a real,
+  verified result word for word; caption people as heard, not as hoped.
+- Preserve the original media and create a distinct output for each revision.
+  Destroy old projects only when the user says so (move to Trash, not `rm`).
+
+## House style (defaults unless the user says otherwise)
+
+- **Talk to the user briefly.** Short status lines, compressed action lists, no
+  recap of steps. Show picks/plans as a scannable list, then build.
+- **Picks:** identify talking takes vs B-roll per video, choose the best take of
+  each line, and say which clip covers which beat before cutting.
+- **Pacing:** aggressive. Remove silences, breaths, room-tone pauses, and dead air
+  at the head/tail of every take (see *Aggressive silence removal*). Jump cuts
+  inside one take alternate a 1.00x / 1.08x punch-in so they read as intentional.
+- **Captions:** 3-5 words, one line, never more than ~26 characters, TikTok Sans
+  Medium, white with a soft shadow (no box), placed just above the speaker's head;
+  moved to the top during full-screen cutaways. Never split names ("Clifton Ave
+  Animal Hospital", "AI home lab"). Details: `references/captions-audio.md`.
+- **Audio:** fill both channels from the live mic, two-pass loudnorm to
+  -14 LUFS (talk) / -22 LUFS (B-roll), remove breaths and silences.
+- **Graphics:** minimal, animated, and intentional — light frosted cards, no
+  black backgrounds or black fills, blur-in entrances, draw-on checks/underlines,
+  slow push-in while held, one accent color, key words in an italic serif.
+  Details and tokens: `references/motion-graphics.md`.
+- **SFX:** understated. At most one soft entry sound plus one accent on the
+  moment that matters (ding on proof, click on a CTA, notification on
+  "comment ___", bell on a celebration). No pop per list item.
+- **Color:** iPhone-level. HDR (HLG/Dolby Vision) clips must be tone-mapped to
+  SDR BT.709 with Apple's converter before editing, or they look washed out.
+- **Study references when given.** Download them (`yt-dlp`), build timestamped
+  contact sheets (2 fps), and extract layout, motion, type, color, and SFX
+  patterns before designing. Summarize the patterns in a few bullets.
 
 ## Quality bar
 
 ### Source and story
 
-- Inspect the available footage, audio, dimensions, frame rate, duration, and
-  existing project structure before changing the timeline.
-- Treat the verified audio and footage as ground truth. Use transcription to
-  accelerate timing, then manually check names, technical terms, and the hook.
-- Make every cut earn its place. Remove duplicate material, dead pauses, or
-  distracting tail moments only when the change improves comprehension or
-  momentum; preserve a gesture or reaction when it carries meaning.
-- Organize the edit around the actual story beats: hook, context or proof,
-  process, result, and call to action when those beats exist. Do not force a
-  template onto footage that does not support it.
+- Inspect footage, audio channels, dimensions, frame rate, color transfer
+  (`ffprobe ... color_transfer` — `arib-std-b67` means HLG), and duration first.
+- Treat verified audio and footage as ground truth. Transcription only speeds
+  up timing; manually check names, technical terms, the hook, and the CTA.
+- Organize around real story beats: hook, context/proof, process, result, CTA.
 
 ### Visual system
 
-- Tie overlays, cards, titles, and transitions to the spoken idea they explain;
-  they should clarify the hook, tool, action, proof, or CTA rather than decorate
-  empty time.
-- Keep a restrained, consistent visual language: a small type system, clear
-  hierarchy, deliberate accent color, and transitions that do not compete with
-  the speaker.
-- Protect the face, eyes, hands, microphone, and meaningful gestures. Place
-  cards in open safe areas and check the full frame at the moments where the
-  subject moves, points, or changes position.
-- Prefer readable overlays that remain on screen for the full idea they support.
-  Avoid rapid flashes, stacked UI noise, or cards that obscure the proof.
-- Preserve the intended aspect ratio and platform framing. Check crop, edge
-  safety, contrast, and legibility at the actual delivery size.
+- Tie every overlay to the word that introduces it (anchor graphics to word
+  timestamps, not guesses) and keep it up for the whole idea.
+- Protect face, eyes, hands, mic, and gestures; check the full frame at each
+  overlay, including the bottom edge (stacked badges get clipped).
+- Balance multi-line kinetic text (`text-wrap: balance`) so no word is orphaned.
 
 ### Captions and claims
 
-- Correct obvious transcription errors against the audio, including product,
-  brand, repository, and technical names.
-- Keep caption timing aligned to speech and break lines for one-pass reading.
-  Use styling that remains legible over motion without an opaque box unless the
-  footage requires one.
-- Never caption an unsupported phrase merely because it would improve the hook.
-  Record the limitation in the edit report when requested wording is not
-  present or clear in the audio.
-- Keep captions and overlays semantically consistent with each other and with
-  the final audio.
+- Correct transcription errors against the audio. Keep caption text and
+  overlay text consistent with the final audio.
+- Whisper timing is unreliable around silence; realign words into speech
+  islands before cutting or captioning (built into `scripts/cut_silences.py`).
+- Every transcript word must survive the cut: compare word counts/text before
+  and after de-silencing.
+
+## Aggressive silence removal (default)
+
+Run `scripts/clean_audio.py` first, then `scripts/cut_silences.py` with whisper
+word timings (`whisper-cli -ml 1 -sow -ojf`). Defaults:
+
+| Setting | Value |
+|---|---|
+| Threshold | per clip: floor(p10 RMS) + 0.45 x (speech(p80) - floor), clamped -40..-24 dB |
+| Detection | `silencedetect d=0.12` |
+| Cut | every silence >= 0.14 s; keep 0.05 s tail, 0.04 s lead |
+| Word-gap cut | any realigned word gap > 0.22 s (breaths/room tone); keep 0.08 s tail, 0.05 s lead |
+| Head/tail | trim to first word - 0.06 s / last word + 0.12 s |
+| Min piece | drop keep ranges < 0.12 s |
+
+Before trusting the cut, realign words: whisper smears early words across
+leading silence (seen: 6 of 10 words inside 3.5 s of silence), which both keeps
+dead air and puts captions out of sync. If whisper text changes on a re-run,
+keep the previously verified text and only take the new timings.
+
+## Background removal on macOS
+
+Use Apple's native Vision background remover (same engine as Finder/Preview
+"Remove Background"). Do **not** drive CapCut's chroma key or "Remove
+background" with desktop automation — it is slow, unverifiable, and not
+reproducible.
+
+- Stills / logos / products: `swift scripts/mac_remove_bg.swift in.png out.png`
+  (foreground-instance mask; `--mode person` for people).
+- Video: `scripts/mac_remove_bg_video.sh in.mov out.mov person` — extracts
+  frames, masks each with Vision (person segmentation is steadier frame to
+  frame), and encodes HEVC-with-alpha that CapCut displays correctly.
+- Inspect a composite over a solid color before placing it.
+
+## CapCut on macOS (native drafts)
+
+Building the timeline directly as a CapCut draft is preferred over UI
+automation. Read `references/capcut-mac.md` before writing any draft. The
+non-negotiables:
+
+1. **Sandbox:** CapCut (App Store build) can read only `~/Movies`, its own
+   container, and files picked in its dialog. Copy every clip, overlay, SFX, and
+   font-referenced file under `~/Movies/CapCut Media/<project>/` or the draft
+   opens with "Link media / File not accessible". The builder must refuse to save
+   if any path is elsewhere.
+2. **Alpha overlays:** CapCut draws a black box behind ProRes 4444 alpha and
+   behind avconvert's HEVC-alpha preset. Use VideoToolbox HEVC with alpha:
+   `scripts/to_hevc_alpha.sh` (`hevc_videotoolbox -alpha_quality 0.95 -pix_fmt
+   bgra -tag:v hvc1`).
+3. **HDR clips:** `avconvert -p PresetHighestQuality` first (Apple tone mapping),
+   then encode tagged bt709.
+4. **Quit CapCut** before writing drafts; register each draft in
+   `root_meta_info.json`; replace `<name>` and CapCut's renamed `<name>(1)` copies
+   (move to Trash) on rebuild.
+5. **Fonts** go in CapCut's own effect cache so the sandbox can load them.
 
 ## Preferred workflow
 
-1. **Inventory the source.** Identify the project, source clips, audio, target
-   format, existing timing data, and any duplicate or reference-only media.
-   Record the starting state so the source remains recoverable.
-2. **Establish the spoken timeline.** Transcribe with the available local or
-   project-supported tool. Verify the hook, proper nouns, technical terms, and
-   CTA against the audio before building caption or overlay timing.
-3. **Plan the cut.** Map shots and graphics to real story beats. Tighten dead
-   space with a reason, keep important gestures intact, and preserve original
-   audio unless the user explicitly asks for a soundtrack change.
-4. **Build the visual treatment.** Create cards, titles, and motion graphics
-   from the beat map. Keep the hierarchy consistent, use safe areas, and make
-   each graphic support a specific idea.
-5. **Render a distinct revision.** Keep source and prior renders intact. Export
-   the requested codec, dimensions, frame rate, and audio in a durable output
-   location. Produce an SRT or other sidecar when it is useful for the request.
-6. **Inspect the result.** Sample frames or a contact sheet at the hook, every
-   major graphic beat, transitions, caption changes, and CTA. Check for
-   obstruction, clipping, unreadable type, bad crops, stale cards, and caption
-   drift.
-7. **Verify the file.** Run metadata inspection such as `ffprobe` and a full
-   decode to a null sink or equivalent. A render that was interrupted, has a
-   missing container index, or cannot decode is not complete; rerender it before
-   reporting success.
-8. **Package the handoff.** Deliver the final video and any sidecars, plus a
-   concise report covering the source cut, visual decisions, verification, and
-   known limitations. Link the actual files, not only an internal project path.
+1. **Inventory** clips, audio channels, HDR flags, target format, and existing
+   timing data. Record the starting state.
+2. **Clean audio** (`clean_audio.py`) and **transcribe** (whisper small.en or
+   better, word level). Verify hook, names, CTA.
+3. **Pick takes** and present the plan (talking vs B-roll per beat).
+4. **Cut** with `cut_silences.py`; build the timeline (segments, words,
+   captions) in a reviewable JSON manifest.
+5. **Design graphics** from the beat map (reference study first if given);
+   render with the frame-accurate renderer in `references/motion-graphics.md`;
+   encode alpha overlays for the target editor.
+6. **Assemble** — ffmpeg render, or CapCut draft per `references/capcut-mac.md`.
+7. **Inspect**: contact sheets at the hook, every overlay (composite extracted
+   PNG frames, not seeked two-input overlays), caption changes, and CTA; open
+   the CapCut draft and scrub at least one overlay to confirm transparency.
+8. **Verify files**: `ffprobe` + full decode to null. When files cross machines,
+   compare decoded-frame MD5 (`ffmpeg -i f -map 0:v -f md5 -`); container bytes
+   may legitimately differ.
+9. **Hand off**: say what changed in one or two sentences, where it lives, and
+   any limitation.
 
-## Tool and project guidance
+## Known failure modes and fixes
 
-- For Higgsedit projects, prefer the native project and composition APIs so the
-  edit remains inspectable and editable. Use bounded operations on an existing
-  human/shared edit; a whole-script rebuild is appropriate only when replacing
-  the intended timeline.
-- For local ffmpeg or graphics workflows, reuse the existing project scripts,
-  timing manifests, fonts, overlays, and render conventions before introducing
-  a new pipeline.
-- Keep timing data in a reviewable manifest or sidecar when the workflow uses
-  one. Regenerate derived overlays and captions from the corrected source data
-  instead of patching only a final composite.
-- If a required input, credential, or source fact is missing, preserve the
-  source and report the smallest concrete blocker rather than fabricating a
-  result.
+| Symptom | Cause | Fix |
+|---|---|---|
+| CapCut "Link media / File not accessible" | media outside the sandbox | copy under `~/Movies`, builder guard |
+| Black box behind graphics in CapCut | ProRes 4444 / avconvert HEVC alpha ignored | `to_hevc_alpha.sh` (VideoToolbox HEVC alpha) |
+| Washed-out iPhone footage | HLG not tone-mapped | `avconvert -p PresetHighestQuality`, tag bt709 |
+| Duplicate "(1)" drafts | CapCut renames drafts it picks up | rebuild replaces `<name>` and `<name>(N)` |
+| Quiet, one-sided voice | lav on one channel only | pick live channel, dual-mono out |
+| Captions out of sync / dead air at take start | whisper smears words over silence | realign into speech islands |
+| Words missing after cuts | words timed in cut silence | realign, then assert word count unchanged |
+| Captions split names / flash / overlap | naive chunking | DP chunker with name penalties, merge < 0.25 s, clamp to next |
+| Overlay misplaced in QA sheet | ffmpeg seek on two inputs | extract PNG frames first, then composite |
+| Bottom badges clipped | overlay y too low | check full frame, raise y |
+| Orphan word in kinetic text | default wrapping | `text-wrap: balance` |
+
+## Bundled files
+
+| File | Use |
+|---|---|
+| `scripts/clean_audio.py` | live-channel pick, two-pass loudnorm, dual mono |
+| `scripts/cut_silences.py` | aggressive de-silencing + word realignment -> JSON keep ranges |
+| `scripts/mac_remove_bg.swift` | Apple Vision background removal for images / frame folders |
+| `scripts/mac_remove_bg_video.sh` | video cut-out -> HEVC-with-alpha |
+| `scripts/to_hevc_alpha.sh` | convert alpha overlays to the format CapCut honors |
+| `scripts/render_overlays.js` | frame-accurate HTML/CSS -> video renderer (Playwright) |
+| `assets/overlay-base.css` | design tokens + enter/hold/exit/draw-on animations |
+| `references/capcut-mac.md` | draft format, sandbox, formats, rebuild hygiene |
+| `references/motion-graphics.md` | look, motion, SFX policy, rendering, reference study |
+| `references/captions-audio.md` | audio chain, transcription, caption chunking and placement |
 
 ## Completion checklist
 
-Before calling the edit finished, confirm:
-
-- The output is a distinct, playable file in the requested format.
-- The audio is preserved or intentionally changed, and the export has the
-  expected duration and streams.
-- The hook, proof/process beats, and CTA are visually legible where present.
-- Captions match verified speech, including names and technical terms.
-- Graphics do not cover faces, hands, microphones, or meaningful gestures.
-- Key frames have been inspected at the actual output size.
-- Metadata inspection and a full decode pass succeed.
-- Any unsupported requested wording or other limitation is documented.
+- Distinct, playable output (file or CapCut draft) in the requested format.
+- Audio filled on both channels, normalized, silences/breaths removed, every
+  word still present.
+- Captions 3-5 words, one line, in sync, names intact, matched to verified speech.
+- Graphics minimal, no black backgrounds, transparent in the target editor, not
+  covering faces/hands/mic, fully inside the frame.
+- SFX sparse and on the beat that matters.
+- Key frames inspected at output size; metadata check and full decode pass.
+- Limitations documented.
