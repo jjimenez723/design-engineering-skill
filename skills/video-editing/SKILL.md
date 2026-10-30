@@ -43,15 +43,24 @@ accurate and in sync, and whose output has been visually inspected and decoded.
   inside one take alternate a 1.00x / 1.08x punch-in so they read as intentional.
 - **Captions:** 3-5 words, one line, never more than ~26 characters, TikTok Sans
   Medium, white with a soft shadow (no box), placed just above the speaker's head;
-  moved to the top during full-screen cutaways. Never split names ("Clifton Ave
+  moved to the top during full-screen cutaways. **Captions are only on screen while
+  the speaker is talking**: a caption never spans a pause, ends at its last word
+  (+0.12 s), and the screen goes blank during pauses ("Hey, this is Jensy." + pause
+  = no text until the next word). `scripts/captions.py` enforces and checks this. Never split names ("Clifton Ave
   Animal Hospital", "AI home lab"). Details: `references/captions-audio.md`.
 - **Audio:** fill both channels from the live mic, two-pass loudnorm to
   -14 LUFS (talk) / -22 LUFS (B-roll), remove breaths and silences.
+- **Graphics placement:** always in the bottom third, below the face — never over
+  the face. Fit each overlay's visible content (alpha bounding box) into the band
+  from max(0.667, face bottom + 0.015) to 0.935 of frame height, scaling down when
+  it does not fit. Full-screen cutaways are the only exception.
 - **Graphics:** minimal, animated, and intentional — light frosted cards, no
   black backgrounds or black fills, blur-in entrances, draw-on checks/underlines,
   slow push-in while held, one accent color, key words in an italic serif.
   Details and tokens: `references/motion-graphics.md`.
-- **SFX:** understated, at -7.5 dB, Ocular Sounds (Momentum whooshes, Mechanica gears) when available. At most one soft entry sound plus one accent on the
+- **SFX:** understated, every clip at -10 dB, Ocular Sounds when available (Momentum
+  whooshes; Vector single clicks). Clicks are always single clicks — one transient,
+  no ratchets, no keystroke barrages. At most one soft entry sound plus one accent on the
   moment that matters (ding on proof, click on a CTA, notification on
   "comment ___", bell on a celebration). No pop per list item. Pick sounds
   from the local library in `assets/audio/` (index: `references/sfx-library.md`).
@@ -180,13 +189,18 @@ non-negotiables:
 | Overlay misplaced in QA sheet | ffmpeg seek on two inputs | extract PNG frames first, then composite |
 | Bottom badges clipped | overlay y too low | check full frame, raise y |
 | Orphan word in kinetic text | default wrapping | `text-wrap: balance` |
+| Caption still showing during a pause | caption end clamped to next caption start | end at last word + 0.12 s, split at pauses, `captions.py` check |
+| Pauses survive the cut (breaths, room tone) | silencedetect misses non-silent pauses | merge RMS pauses (median - 24 dB, >= 0.2 s) into the silence map |
+| Graphic covers the face | fixed mid-frame y | bottom-third band from alpha bbox + face boxes |
+| SFX too loud / busy | stock levels, multi-click sounds | -10 dB, single-transient clicks only |
 
 ## Bundled files
 
 | File | Use |
 |---|---|
 | `scripts/clean_audio.py` | live-channel pick, two-pass loudnorm, dual mono |
-| `scripts/cut_silences.py` | aggressive de-silencing + word realignment -> JSON keep ranges |
+| `scripts/cut_silences.py` | aggressive de-silencing (silence map + RMS pauses) + word realignment -> JSON keep ranges |
+| `scripts/captions.py` | 3-5 word captions that are blank during pauses, with a built-in check |
 | `scripts/mac_remove_bg.swift` | Apple Vision background removal for images / frame folders |
 | `scripts/mac_remove_bg_video.sh` | video cut-out -> HEVC-with-alpha |
 | `scripts/to_hevc_alpha.sh` | convert alpha overlays to the format CapCut honors |
@@ -203,9 +217,10 @@ non-negotiables:
 - Distinct, playable output (file or CapCut draft) in the requested format.
 - Audio filled on both channels, normalized, silences/breaths removed, every
   word still present.
-- Captions 3-5 words, one line, in sync, names intact, matched to verified speech.
-- Graphics minimal, no black backgrounds, transparent in the target editor, not
-  covering faces/hands/mic, fully inside the frame.
+- Captions 3-5 words, one line, in sync, names intact, matched to verified speech,
+  and blank whenever nobody is talking (run the pause check on the final timeline).
+- Graphics minimal, no black backgrounds, transparent in the target editor, in the
+  bottom third below the face, fully inside the frame.
 - SFX sparse and on the beat that matters.
 - Key frames inspected at output size; metadata check and full decode pass.
 - Limitations documented.

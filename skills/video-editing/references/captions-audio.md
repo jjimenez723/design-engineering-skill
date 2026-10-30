@@ -33,8 +33,17 @@
   `clifton|ave`, `animal|hospital`, `oasis|purified`, `purified|water`,
   `ai|home`, `home|lab`, `comment|<keyword>`, `10|years`. A small dynamic
   program over each clause (cost = length deviation + split penalties) works.
-- Each caption starts at its first word and ends at the next caption's start
-  (or last word + 0.5 s). Merge captions that would show for under 0.25 s.
+- **Blank when not talking.** Each caption starts at its first word and ends at its
+  last word + 0.12 s — never at "the next caption's start". A caption never spans a
+  pause: split clauses at word gaps > 0.25 s and at detected pauses (silence map +
+  20 ms RMS below the speech median - 20/24 dB for >= 0.2 s), and never merge short
+  clauses across a pause. If a pause begins inside a caption, end it 0.05 s after
+  the pause starts. Minimum 0.35 s on screen unless the next caption starts sooner.
+- Merge captions that would flash for under 0.25 s only when there is no gap
+  between them.
+- Verify on the final timeline: map each clip's pauses onto the timeline and assert
+  no caption is visible for > 0.25 s of any pause and no captions overlap
+  (`scripts/captions.py` `check()`).
 - Style: TikTok Sans Medium, white, soft drop shadow (alpha .55, blur .18,
   distance 4), no box. Position just above the speaker's head (median face top
   - 0.085 of frame height, clamped 0.12-0.27 from the top); move to 0.085 from the

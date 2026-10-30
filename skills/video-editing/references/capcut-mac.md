@@ -48,6 +48,10 @@ audio, text) and deep-copy those samples with new UUIDs, paths, and timeranges.
 - `clip.scale = 1.0` fits the material's width to the canvas, so a 1080-wide
   overlay at scale 1.0 is pixel-exact on a 1080x1920 canvas (864-wide renders
   upscale to the same size).
+- Bottom-band placement with scale s for an overlay W x H whose visible content
+  is rows y0..y1: f = 1080 / W; content height = (y1 - y0) * f * s; asset centre
+  = content centre - ((y0 + y1) / 2 - H / 2) * f * s; `transform.y = 1 - 2 *
+  asset_centre / 1920`.
 - Track layering: talking video `render_index` 0; full-screen cutaways
   11000; overlays 12000; text 14000. Put each SFX on an audio track, opening a
   new track only when sounds overlap.

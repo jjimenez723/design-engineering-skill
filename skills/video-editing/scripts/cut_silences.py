@@ -5,7 +5,8 @@ usage: cut_silences.py clean.mov [--words whisper.json] [--keep-from WORD#N] [--
 
 Default is AGGRESSIVE (short-form): pauses with breaths/room tone are cut too, not just true silence.
 1. Adaptive threshold per clip: floor = 10th pct RMS, speech = 80th pct; thr = floor + 0.45*(speech-floor),
-   clamped to [-40, -24] dB. silencedetect d=0.12.
+   clamped to [-40, -24] dB. silencedetect d=0.12. Then merge in RMS pauses (20 ms windows below the clip's
+   speech median - 24 dB for >= 0.2 s) — breaths and room tone that silencedetect misses.
 2. Cut every silence >= 0.14 s, keeping 0.05 s after the last word and 0.04 s before the next.
 3. With whisper word timings (whisper-cli -ml 1 -sow -ojf, or [{"t0","t1","w"}]):
    a. REALIGN words into speech islands (non-silent spans >= 0.08 s). Whisper smears words across silence,
@@ -39,6 +40,28 @@ def silences(src):
         if m and cur is not None: out.append((cur, float(m.group(1)))); cur = None
     if cur is not None: out.append((cur, 9e9))
     return out, thr
+
+def rms_pauses(src, rel_db=24, min_len=0.2):
+    """Pauses the silence detector misses (breaths, room tone): 20 ms RMS below the clip's speech median - rel_db
+    for >= min_len. Merged into the silence map so cuts, word realignment and captions all agree."""
+    r = subprocess.run(["ffmpeg", "-nostdin", "-i", src, "-af", "asetnsamples=n=960,astats=metadata=1:reset=1,ametadata=print:key=lavfi.astats.Overall.RMS_level", "-f", "null", "-"], capture_output=True, text=True)
+    lv = [float(x) if x != "-inf" else -120.0 for x in re.findall(r"RMS_level=(-?[\d.]+|-inf)", r.stderr)]
+    if not lv: return []
+    hi = sorted(lv)[len(lv) // 2:]; thr = hi[len(hi) // 2] - rel_db; out, run = [], None
+    for i in range(len(lv) + 1):
+        q = i < len(lv) and lv[i] < thr
+        if q and run is None: run = i
+        if not q and run is not None:
+            if (i - run) * 0.02 >= min_len: out.append((run * 0.02, i * 0.02))
+            run = None
+    return out
+
+def merge(a, b):
+    out = []
+    for x, y in sorted(a + b):
+        if out and x <= out[-1][1]: out[-1] = (out[-1][0], max(out[-1][1], y))
+        else: out.append((x, y))
+    return out
 
 def load_words(p):
     j = json.load(open(p))
@@ -82,7 +105,7 @@ def find(ws, key):
     sys.exit(f"anchor {key} not found")
 
 def main():
-    src = sys.argv[1]; D = duration(src); sil, thr = silences(src)
+    src = sys.argv[1]; D = duration(src); sil, thr = silences(src); sil = merge(sil, rms_pauses(src))
     ws = load_words(arg("--words")) if arg("--words") else []
     fw = realign(ws, sil, D) if ws else []
     s0, s1 = 0.0, D

@@ -65,6 +65,7 @@ skills/
     │   ├── captions-audio.md
     │   └── motion-graphics.md
     └── scripts/
+        ├── captions.py
         ├── clean_audio.py
         ├── cut_silences.py
         ├── mac_remove_bg.swift

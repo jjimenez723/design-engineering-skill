@@ -2,3 +2,5 @@
 
 # Licensed SFX library (local only)
 skills/video-editing/assets/audio/
+__pycache__/
+*.pyc
