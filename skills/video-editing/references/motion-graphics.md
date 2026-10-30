@@ -44,8 +44,18 @@ reading-heavy graphics (file trees, screenshots) 2 s+.
   lands ("0 secrets found", a checklist completes), click when a CTA link
   draws, notification on "comment ___", bell on a celebration card, soft
   ticks for list items after the first, sparse key clicks for typing.
-- Relative volumes: pop .40, click .40, ding .32, notify .40, bell .45,
-  whoosh .25, swoosh_soft .16, tick .22, key .22.
+- Library: when the Ocular Sounds packs are available (Jensy's Angel drive:
+  `/Volumes/Angel/Ocular Sounds/Unzipped`), use them instead of stock UI sounds:
+  Momentum `Whooshes - Short/Swing` for graphic entries, Momentum
+  `Whooshes - Medium/Air Spirit` for full-screen cutaways (start 0.15 s before
+  the cut so the peak lands on it), Mechanica `Small Gears` singles for ticks,
+  clicks and list items, Utility mechanical-keyboard quick presses (rotate 4)
+  for typing, Felt pure piano ping for proof/"done" moments, Felt major chord
+  for celebrations. Most Momentum whooshes are heavy cinematic low end; prefer
+  the airy ones (high centroid) and high-pass at 110-140 Hz.
+- Level: trim each sound so the hit is near its start, peak-normalize to
+  -3 dBFS, then set every SFX clip to -7.5 dB in the editor (0.42 linear).
+  SFX should sit under the voice, never compete with it.
 - Never stack a pop on every list item; never more than two sounds per graphic.
 
 ## Rendering pipeline

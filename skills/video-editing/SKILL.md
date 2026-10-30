@@ -51,9 +51,10 @@ accurate and in sync, and whose output has been visually inspected and decoded.
   black backgrounds or black fills, blur-in entrances, draw-on checks/underlines,
   slow push-in while held, one accent color, key words in an italic serif.
   Details and tokens: `references/motion-graphics.md`.
-- **SFX:** understated. At most one soft entry sound plus one accent on the
+- **SFX:** understated, at -7.5 dB, Ocular Sounds (Momentum whooshes, Mechanica gears) when available. At most one soft entry sound plus one accent on the
   moment that matters (ding on proof, click on a CTA, notification on
-  "comment ___", bell on a celebration). No pop per list item.
+  "comment ___", bell on a celebration). No pop per list item. Pick sounds
+  from the local library in `assets/audio/` (index: `references/sfx-library.md`).
 - **Color:** iPhone-level. HDR (HLG/Dolby Vision) clips must be tone-mapped to
   SDR BT.709 with Apple's converter before editing, or they look washed out.
 - **Study references when given.** Download them (`yt-dlp`), build timestamped
@@ -191,6 +192,8 @@ non-negotiables:
 | `scripts/to_hevc_alpha.sh` | convert alpha overlays to the format CapCut honors |
 | `scripts/render_overlays.js` | frame-accurate HTML/CSS -> video renderer (Playwright) |
 | `assets/overlay-base.css` | design tokens + enter/hold/exit/draw-on animations |
+| `assets/audio/` | SFX library: `foundation/`, `momentum/`, `mechanica/` (Ocular singulars), `jensys-effects/` (local only, git-ignored) |
+| `references/sfx-library.md` | what's in each SFX folder and when to use it |
 | `references/capcut-mac.md` | draft format, sandbox, formats, rebuild hygiene |
 | `references/motion-graphics.md` | look, motion, SFX policy, rendering, reference study |
 | `references/captions-audio.md` | audio chain, transcription, caption chunking and placement |
