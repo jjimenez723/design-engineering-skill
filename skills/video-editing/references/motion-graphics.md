@@ -26,7 +26,9 @@ rendered overlay's visible content (union of alpha > 12 over its frames), then
 fit it into the band from max(0.667, face bottom + 0.015) to 0.935 of frame
 height (face boxes from Apple Vision on the clips under the graphic). Scale down
 when the content is taller than the band; sit it slightly above the band's
-centre. Only full-screen cutaways may cover the speaker.
+centre. If that would shrink it below legibility (e.g. a repo screenshot at
+<60%), make it a full-screen cutaway on a light backdrop instead. Only
+full-screen cutaways may cover the speaker.
 
 ## Motion
 
